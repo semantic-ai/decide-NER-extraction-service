@@ -98,14 +98,16 @@ Invoke-WebRequest -Uri "http://localhost:8080/ner/demo" -Method POST -ContentTyp
 To see the extracted entities in a nice table format:
 
 ```powershell
-$response = Invoke-WebRequest -Uri "http://localhost:8080/ner/demo" -Method POST -ContentType "application/json" -Body '{"language": "english", "method": "spacy"}'; $json = $response.Content | ConvertFrom-Json; Write-Host "`n=== NER EXTRACTION RESULTS ===" -ForegroundColor Cyan; Write-Host "Language: $($json.language)" -ForegroundColor Green; Write-Host "Method: $($json.method)" -ForegroundColor Green; Write-Host "Entities Found: $($json.entities_found)" -ForegroundColor Green; Write-Host "`n=== EXTRACTED ENTITIES ===" -ForegroundColor Cyan; $json.entities | Select-Object text, label, confidence | Format-Table -AutoSize
+$response = Invoke-WebRequest -Uri "http://localhost:8080/ner/demo" -Method POST -ContentType "application/json" -Body '{"language": "dutch", "method": "spacy"}'; $json = $response.Content | ConvertFrom-Json; Write-Host "`n=== NER EXTRACTION RESULTS ===" -ForegroundColor Cyan; Write-Host "Language: $($json.language)" -ForegroundColor Green; Write-Host "Method: $($json.method)" -ForegroundColor Green; Write-Host "Entities Found: $($json.entities_found)" -ForegroundColor Green; Write-Host "`n=== ORIGINAL TEXT ===" -ForegroundColor Cyan; Write-Host $json.text_processed -ForegroundColor White; Write-Host "`n=== EXTRACTED ENTITIES ===" -ForegroundColor Cyan; $json.entities | Select-Object text, label, confidence | Format-Table -AutoSize
 ```
 
-For processing real documents:
+For processing real documents (summary only):
 
 ```powershell
 $response = Invoke-WebRequest -Uri "http://localhost:8080/ner/process-jobs" -Method POST -ContentType "application/json"; $json = $response.Content | ConvertFrom-Json; Write-Host "`n=== PROCESSING SUMMARY ===" -ForegroundColor Cyan; Write-Host "Documents Processed: $($json.documents_processed)" -ForegroundColor Green; Write-Host "Successful: $($json.successful)" -ForegroundColor Green; Write-Host "Failed: $($json.failed)" -ForegroundColor Yellow; Write-Host "`n=== RESULTS ===" -ForegroundColor Cyan; $json.results | Format-Table -Property document_uri, success, entities_found, entities_saved -AutoSize
 ```
+
+**Note**: The `/ner/process-jobs` endpoint returns summary information only (entity counts, not the actual entities). To see the extracted entities with full details, use the `/ner/demo` endpoint above.
 
 ## Expected Results
 
