@@ -91,6 +91,9 @@ Invoke-WebRequest -Uri "http://localhost:8080/ner/demo" -Method POST -ContentTyp
 
 # English
 Invoke-WebRequest -Uri "http://localhost:8080/ner/demo" -Method POST -ContentType "application/json" -Body '{"language": "english", "method": "spacy"}'
+
+# German Legal (using Flair legal model)
+Invoke-WebRequest -Uri "http://localhost:8080/ner/demo" -Method POST -ContentType "application/json" -Body '{"language": "german", "method": "flair"}'
 ```
 
 ### View Extracted Entities (Formatted)
@@ -206,15 +209,39 @@ The service uses centralized configuration in `ner_config.py`:
 ### Supported NER Methods
 - **regex**: Pattern-based extraction (excellent for dates)
 - **spacy**: ML-based comprehensive entity recognition
-- **composite**: Combines spaCy + regex for best results
+- **flair**: Flair-based entity recognition with contextual embeddings (German uses legal model)
+- **composite**: Combines Flair + regex for best results
 
 ### Supported Entity Types
+
+**General NER (spaCy/Flair):**
 - **DATE**: Dates in various formats (regex/spaCy)
-- **PERSON**: Person names (spaCy)
-- **ORG**: Organizations (spaCy)
-- **GPE**: Geopolitical entities (spaCy)
-- **CARDINAL**: Numbers (spaCy)
-- **EVENT**: Events (spaCy)
+- **PERSON**: Person names (spaCy/Flair)
+- **ORG**: Organizations (spaCy/Flair)
+- **GPE**: Geopolitical entities (spaCy/Flair)
+- **CARDINAL**: Numbers (spaCy/Flair)
+- **EVENT**: Events (spaCy/Flair)
+
+**German Legal NER (Flair Legal Model):**
+- **AN**: Anwalt (Lawyer)
+- **EUN**: Europäische Norm (European Standard)
+- **GS**: Gesetz (Law)
+- **GRT**: Gericht (Court)
+- **INN**: Institution (Institution)
+- **LD**: Land (Country/State)
+- **LDS**: Landschaft (Region)
+- **LIT**: Literatur (Literature)
+- **MRK**: Marke (Brand)
+- **ORG**: Organisation (Organization)
+- **PER**: Person (Person)
+- **RR**: Richter (Judge)
+- **RS**: Rechtssprechung (Jurisprudence)
+- **ST**: Stadt (City)
+- **STR**: Straße (Street)
+- **UN**: Unternehmen (Company)
+- **VO**: Verordnung (Regulation)
+- **VS**: Vorschrift (Rule)
+- **VT**: Vertrag (Contract)
 
 ### Language-Specific Regex Patterns
 - **Dutch dates**: `\d{1,2}\s+(?:januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december)\s+\d{4}`

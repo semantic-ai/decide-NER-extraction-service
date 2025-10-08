@@ -1,5 +1,8 @@
+-f https://download.pytorch.org/whl/torch_stable.html
 flask
 SPARQLWrapper
 rdflib
 numpy<=1.26.x
 spacy==3.6.1
+torch==2.3.1+cpu
+flair
