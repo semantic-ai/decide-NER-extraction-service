@@ -3,10 +3,9 @@ NER Entity Extractors
 
 This module contains different NER extraction methods organized by approach.
 """
-
-from typing import List, Dict, Any
 import re
-
+from flair.data import Sentence
+from typing import List, Dict, Any
 from .ner_models import model_manager
 from .ner_config import REGEX_PATTERNS, DEFAULT_SETTINGS
 
@@ -79,6 +78,53 @@ class SpacyExtractor(BaseExtractor):
             
         except Exception as e:
             print(f"Error in spaCy extraction ({self.language}): {e}")
+            return []
+
+
+class FlairExtractor(BaseExtractor):
+    """Extract entities using Flair models."""
+    
+    def __init__(self, language: str = 'german', model_name: str = None):
+        super().__init__(language)
+        self.model_name = model_name or self._get_default_model()
+    
+    def _get_default_model(self) -> str:
+        """Get default Flair model based on language."""
+        model_mapping = {
+            'german': 'flair/ner-german-legal',
+            'english': 'flair/ner-english',
+            'dutch': 'flair/ner-dutch'
+        }
+        return model_mapping.get(self.language, 'flair/ner-english')
+    
+    def extract(self, text: str) -> List[Dict[str, Any]]:
+        """Extract entities using Flair NER."""
+        try:
+            # Load the Flair SequenceTagger model
+            tagger = model_manager.get_flair_model(self.model_name)
+            
+            # Create sentence (don't use tokenizer for legal texts as recommended)
+            sentence = Sentence(text, use_tokenizer=False)
+            
+            # Predict NER tags using the SequenceTagger
+            tagger.predict(sentence)
+            
+            entities = []
+            # Iterate over entities and extract information
+            for entity in sentence.get_spans('ner'):
+                entities.append({
+                    'text': entity.text,
+                    'label': entity.get_label('ner').value,
+                    'start': entity.start_position,
+                    'end': entity.end_position,
+                    'confidence': entity.get_label('ner').score
+                })
+            
+            entities = self._filter_by_confidence(entities)
+            return self._deduplicate_entities(entities)
+            
+        except Exception as e:
+            print(f"Error in Flair extraction ({self.model_name}): {e}")
             return []
 
 
@@ -159,9 +205,9 @@ class CompositeExtractor(BaseExtractor):
 
 # Pre-configured extractors for common use cases
 def create_german_extractor() -> CompositeExtractor:
-    """Create a comprehensive German NER extractor."""
+    """Create a comprehensive German NER extractor using Flair's legal model."""
     return CompositeExtractor([
-        SpacyExtractor('german'),
+        FlairExtractor('german', 'flair/ner-german-legal'),
         LanguageRegexExtractor('german')
     ])
 

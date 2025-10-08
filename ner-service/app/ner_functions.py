@@ -11,6 +11,7 @@ from .ner_extractors import (
     create_dutch_extractor, 
     create_english_extractor,
     SpacyExtractor,
+    FlairExtractor,
     LanguageRegexExtractor
 )
 
@@ -25,7 +26,7 @@ def get_extractor(language: str, extractor_type: str = 'composite'):
     
     Args:
         language: Language code ('german', 'dutch', 'english')
-        extractor_type: Type of extractor ('composite', 'spacy', 'flair', 'date')
+        extractor_type: Type of extractor ('composite', 'spacy', 'flair', 'regex')
         
     Returns:
         Configured extractor instance
@@ -46,6 +47,9 @@ def get_extractor(language: str, extractor_type: str = 'composite'):
         elif extractor_type == 'spacy':
             _extractors[key] = SpacyExtractor(language)
         
+        elif extractor_type == 'flair':
+            _extractors[key] = FlairExtractor(language)
+        
         elif extractor_type == 'regex':
             _extractors[key] = LanguageRegexExtractor(language)
         
@@ -62,18 +66,22 @@ def extract_entities(text: str, language: str = 'german', method: str = 'composi
     Args:
         text: Input text to process
         language: Language of the text ('german', 'dutch', 'english')
-        method: Extraction method ('composite', 'spacy', 'regex')
+        method: Extraction method ('composite', 'spacy', 'flair', 'regex')
         
     Returns:
         List of entity dictionaries with keys: text, label, start, end, confidence
         
     Example:
         entities = extract_entities("John Doe works at Microsoft in Berlin.", 'english')
+        # For German legal text using Flair:
+        entities = extract_entities("Herr W. verstieß gegen § 36 Abs. 7 IfSG.", 'german', 'flair')
     """
     if method == 'composite':
         extractor = get_extractor(language, 'composite')
     elif method == 'spacy':
         extractor = get_extractor(language, 'spacy')
+    elif method == 'flair':
+        extractor = get_extractor(language, 'flair')
     elif method == 'regex':
         extractor = get_extractor(language, 'regex')
     else:
