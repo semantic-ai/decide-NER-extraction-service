@@ -1,6 +1,0 @@
-flask
-SPARQLWrapper
-rdflib
-numpy<=1.26.x
-spacy==3.6.1
-
