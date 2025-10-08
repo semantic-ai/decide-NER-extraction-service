@@ -3,23 +3,20 @@ version: '3.8'
 services:
   ner-service:
     build:
-      context: ./ner-service
-      dockerfile: Dockerfile
-    container_name: my-python-service
+      context: .
+    container_name: ner-service
     ports:
-      - "8080:80"
+      - "8082:80"
     environment:
       - MODE=development
       - APP_ENTRYPOINT=web
       - MU_APPLICATION_GRAPH=http://mu.semte.ch/application
       - MU_SPARQL_ENDPOINT=http://app-decide-virtuoso-1:8890/sparql
       - MU_SPARQL_UPDATE_ENDPOINT=http://app-decide-virtuoso-1:8890/sparql
-    volumes:
-      - ./ner-service:/app
     networks:
-      - mu-python-network
+      - decide
     restart: unless-stopped
 
 networks:
-  mu-python-network:
+  decide:
     external: true
