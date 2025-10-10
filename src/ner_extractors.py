@@ -4,10 +4,11 @@ NER Entity Extractors
 This module contains different NER extraction methods organized by approach.
 """
 import re
+import json
 from flair.data import Sentence
 from typing import List, Dict, Any
 from .ner_models import model_manager
-from .ner_config import REGEX_PATTERNS, DEFAULT_SETTINGS
+from .ner_config import REGEX_PATTERNS, DEFAULT_SETTINGS, TITLE_EXTRACTION_INSTRUCTION, NER_MODELS
 
 
 class BaseExtractor:
@@ -128,6 +129,70 @@ class FlairExtractor(BaseExtractor):
             return []
 
 
+class TitleExtractor(BaseExtractor):
+    """Extract document title using Hugging Face Gemma model."""
+    
+    def __init__(self, language: str = 'dutch'):
+        super().__init__(language)
+    
+    def extract(self, text: str) -> List[Dict[str, Any]]:
+        """
+        Extract title from text using Gemma model.
+        
+        Returns a single entity with label 'TITLE'.
+        """
+        try:
+            # Load the title extraction pipeline
+            generator = model_manager.get_title_extraction_model()
+            
+            # Prepare the prompt combining instruction and text
+            prompt = f"{TITLE_EXTRACTION_INSTRUCTION}\n\nText:\n{text}"
+            
+            # Create conversation format matching HuggingFace example
+            conversation = [{"role": "user", "content": prompt}]
+            
+            # Generate the title (matching HF example format)
+            max_tokens = NER_MODELS['title_extraction']['max_new_tokens']
+            output = generator(
+                conversation, 
+                max_new_tokens=max_tokens, 
+                return_full_text=False
+            )[0]
+            
+            # Parse the generated text to extract JSON
+            generated_text = output['generated_text']
+            
+            # Try to extract JSON from the response
+            try:
+                # Look for JSON in the response
+                if '{' in generated_text and '}' in generated_text:
+                    start_idx = generated_text.find('{')
+                    end_idx = generated_text.rfind('}') + 1
+                    json_str = generated_text[start_idx:end_idx]
+                    result = json.loads(json_str)
+                    title = result.get('title', '').strip()
+                else:
+                    # Fallback: treat whole response as title
+                    title = generated_text.strip()
+            except json.JSONDecodeError:
+                # If JSON parsing fails, use the whole response
+                title = generated_text.strip()
+            
+            if title:
+                entities = [{
+                    'text': title,
+                    'label': 'TITLE',
+                    'start': 0,
+                    'end': len(title),
+                    'confidence': 1.0
+                }]
+                return entities
+            
+            return []
+            
+        except Exception as e:
+            print(f"Error in title extraction: {e}")
+            return []
 
 
 class RegexExtractor(BaseExtractor):

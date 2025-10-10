@@ -11,6 +11,10 @@ NER_MODELS = {
         'dutch': 'nl_core_news_sm',
         'german': 'de_core_news_sm',
         'english': 'en_core_web_sm'
+    },
+    'title_extraction': {
+        'model': 'javdrher/decide-gemma3-270m',
+        'max_new_tokens': 4000
     }
 }
 
@@ -41,6 +45,18 @@ REGEX_PATTERNS = {
         r"\b(Januari|Februari|Maart|April|Mei|Juni|Juli|Augustus|September|Oktober|November|December)\s+(\d{4})\b"
     ]}
 }
+
+# Title extraction instruction for Gemma model
+# Works for both Dutch and German legal documents
+TITLE_EXTRACTION_INSTRUCTION = """
+    Your task is to generate responses in JSON format.
+    Ensure that your output strictly follows the provided JSON structure.
+    Each key in the JSON should be correctly populated according to the instructions given.
+    Pay attention to details and ensure the JSON is well-formed and valid.
+    Only use phrases present in the given text.
+    Extract the title from the following text and return it in JSON format with the key \"title\".
+    The title should be the main heading or subject of the document.
+"""
 
 # Default extraction settings
 DEFAULT_SETTINGS = {

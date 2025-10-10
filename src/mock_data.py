@@ -1,4 +1,7 @@
 GENT_BESLUIT = """
+
+Onderwerp: Goedkeuring van het reglement inzake gebruik van gemeentelijke sportinfrastructuur
+
 Gemeente Zonnedorp
 College van Burgemeester en Schepenen
 
@@ -10,8 +13,6 @@ Aanwezig:
 - Annelies De Smet, Schepen van Financiën
 - Tom Willems, Schepen van Openbare Werken
 - Els Van Damme, Secretaris
-
-Onderwerp: Goedkeuring van het reglement inzake gebruik van gemeentelijke sportinfrastructuur
 
 Het College van Burgemeester en Schepenen,
 
