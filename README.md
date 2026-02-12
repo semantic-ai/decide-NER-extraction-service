@@ -1,3 +1,4 @@
+# CURRENT DEVELOPMENT HAS MOVED TO https://github.com/semantic-ai/decide-geocoding-service
 # Named Entity Recognition (NER) Service
 
 A Flask-based microservice for Named Entity Recognition built on the `mu-python-template` framework. This service provides multiple NER methods including spaCy and regex-based extraction with support for multiple languages.
